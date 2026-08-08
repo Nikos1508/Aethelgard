@@ -1,26 +1,12 @@
 const canvas = document.getElementById("starfield");
 
-const startButton = document.getElementById("startButton");
-const statusText = document.getElementById("status");
-
-const alphaText = document.getElementById("alpha");
-const betaText = document.getElementById("beta");
-const gammaText = document.getElementById("gamma");
-
-
-// ============================================================
-// THREE.JS SETUP
-// ============================================================
 
 const scene = new THREE.Scene();
 
 scene.background = new THREE.Color(0x02020a);
 
-
-// Camera
-
 const camera = new THREE.PerspectiveCamera(
-    75,
+    70,
     window.innerWidth / window.innerHeight,
     0.1,
     2000
@@ -28,8 +14,6 @@ const camera = new THREE.PerspectiveCamera(
 
 camera.position.set(0, 0, 0);
 
-
-// Renderer
 
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -46,18 +30,17 @@ renderer.setSize(
 );
 
 
-// ============================================================
-// STAR DOME
-// ============================================================
+const STAR_COUNT = 2000;
+const SKY_RADIUS = 500;
 
-const STAR_COUNT = 1500;
+const positions = new Float32Array(
+    STAR_COUNT * 3
+);
 
-const positions = new Float32Array(STAR_COUNT * 3);
-const colors = new Float32Array(STAR_COUNT * 3);
-const sizes = new Float32Array(STAR_COUNT);
+const colors = new Float32Array(
+    STAR_COUNT * 3
+);
 
-
-// Star colors
 
 const STAR_COLORS = [
     new THREE.Color("#ffffff"),
@@ -69,29 +52,15 @@ const STAR_COLORS = [
 ];
 
 
-// Radius of our imaginary sky
-
-const SKY_RADIUS = 500;
-
-
-// Generate stars on a sphere
-
 for (let i = 0; i < STAR_COUNT; i++) {
 
-    /*
-        Generate a random point on a sphere.
+    const theta =
+        Math.random() * Math.PI * 2;
 
-        We use spherical coordinates:
-
-        theta = horizontal angle
-        phi   = vertical angle
-    */
-
-    const theta = Math.random() * Math.PI * 2;
-
-    const phi = Math.acos(
-        2 * Math.random() - 1
-    );
+    const phi =
+        Math.acos(
+            2 * Math.random() - 1
+        );
 
 
     const x =
@@ -113,29 +82,20 @@ for (let i = 0; i < STAR_COUNT; i++) {
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = z;
 
-
-    // Random star color
-
     const color =
         STAR_COLORS[
             Math.floor(
-                Math.random() * STAR_COLORS.length
+                Math.random() *
+                STAR_COLORS.length
             )
         ];
+
 
     colors[i * 3] = color.r;
     colors[i * 3 + 1] = color.g;
     colors[i * 3 + 2] = color.b;
-
-
-    // Random size
-
-    sizes[i] =
-        Math.random() * 2.5 + 0.5;
 }
 
-
-// Geometry
 
 const starGeometry =
     new THREE.BufferGeometry();
@@ -156,23 +116,10 @@ starGeometry.setAttribute(
     )
 );
 
-starGeometry.setAttribute(
-    "size",
-    new THREE.BufferAttribute(
-        sizes,
-        1
-    )
-);
-
-
-// ============================================================
-// STAR MATERIAL
-// ============================================================
-
 const starMaterial =
     new THREE.PointsMaterial({
 
-        size: 2.5,
+        size: 2.2,
 
         sizeAttenuation: false,
 
@@ -185,9 +132,6 @@ const starMaterial =
         depthWrite: false
     });
 
-
-// Create star field
-
 const starField =
     new THREE.Points(
         starGeometry,
@@ -196,204 +140,242 @@ const starField =
 
 scene.add(starField);
 
+function createTitle() {
 
-// ============================================================
-// DEVICE ORIENTATION
-// ============================================================
+    const canvas =
+        document.createElement("canvas");
 
-let deviceAlpha = 0;
-let deviceBeta = 0;
-let deviceGamma = 0;
+    canvas.width = 1024;
+    canvas.height = 256;
+
+    const context =
+        canvas.getContext("2d");
+
+    context.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
 
-// Smooth values
+    context.font =
+        "800 110px Poppins, sans-serif";
 
-let smoothAlpha = 0;
-let smoothBeta = 0;
-let smoothGamma = 0;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+
+    context.shadowColor =
+        "rgba(255,255,255,0.8)";
+
+    context.shadowBlur = 30;
 
 
-// When the phone moves
+    context.fillStyle =
+        "#ffffff";
+
+
+    context.fillText(
+        "TIME CAPSULE",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+
+    const texture =
+        new THREE.CanvasTexture(canvas);
+
+    texture.colorSpace =
+        THREE.SRGBColorSpace;
+
+
+    // Sprite material
+
+    const material =
+        new THREE.SpriteMaterial({
+
+            map: texture,
+
+            transparent: true,
+
+            depthWrite: false
+        });
+
+
+    const title =
+        new THREE.Sprite(material);
+
+    title.position.set(
+        0,
+        2,
+        -25
+    );
+
+
+    title.scale.set(
+        14,
+        3.5,
+        1
+    );
+
+
+    scene.add(title);
+
+    return title;
+}
+
+
+const title =
+    createTitle();
+
+
+let alpha = 0;
+let beta = 0;
+let gamma = 0;
+
+let orientationAvailable = false;
 
 function handleOrientation(event) {
 
-    if (event.alpha !== null) {
-
-        deviceAlpha = event.alpha;
-
-    }
-
-    if (event.beta !== null) {
-
-        deviceBeta = event.beta;
-
-    }
-
-    if (event.gamma !== null) {
-
-        deviceGamma = event.gamma;
-
+    if (
+        event.alpha === null &&
+        event.beta === null &&
+        event.gamma === null
+    ) {
+        return;
     }
 
 
-    // Debug information
+    orientationAvailable = true;
 
-    alphaText.textContent =
-        deviceAlpha.toFixed(1);
 
-    betaText.textContent =
-        deviceBeta.toFixed(1);
+    alpha =
+        event.alpha || 0;
 
-    gammaText.textContent =
-        deviceGamma.toFixed(1);
+    beta =
+        event.beta || 0;
+
+    gamma =
+        event.gamma || 0;
+
+
+    console.log(
+        "Orientation:",
+        alpha,
+        beta,
+        gamma
+    );
 }
 
+window.addEventListener(
+    "deviceorientation",
+    handleOrientation,
+    true
+);
 
-// ============================================================
-// START DEVICE ORIENTATION
-// ============================================================
-
-async function startDeviceOrientation() {
-
-    /*
-        iOS requires permission to access
-        motion/orientation sensors.
-
-        Android normally doesn't need this button.
-    */
-
-    if (
-        typeof DeviceOrientationEvent !== "undefined" &&
-        typeof DeviceOrientationEvent.requestPermission === "function"
-    ) {
-
-        try {
-
-            const permission =
-                await DeviceOrientationEvent.requestPermission();
-
-            if (permission !== "granted") {
-
-                statusText.textContent =
-                    "Motion permission was denied.";
-
-                return;
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-            statusText.textContent =
-                "Could not access motion sensors.";
-
-            return;
-        }
-    }
-
-
-    window.addEventListener(
-        "deviceorientation",
-        handleOrientation,
-        true
+const deviceEuler =
+    new THREE.Euler(
+        0,
+        0,
+        0,
+        "YXZ"
     );
 
 
-    statusText.textContent =
-        "Move your phone to explore the sky";
+function updateDeviceCamera() {
+
+    if (!orientationAvailable) {
+        return;
+    }
+
+    const alphaRad =
+        THREE.MathUtils.degToRad(alpha);
+
+    const betaRad =
+        THREE.MathUtils.degToRad(beta);
+
+    const gammaRad =
+        THREE.MathUtils.degToRad(gamma);
 
 
-    startButton.style.display =
-        "none";
+    deviceEuler.set(
+        betaRad,
+        alphaRad,
+        -gammaRad,
+        "YXZ"
+    );
+
+
+    camera.quaternion
+        .setFromEuler(deviceEuler);
 }
 
+let mouseX = 0;
+let mouseY = 0;
 
-// Button
+let mouseTargetX = 0;
+let mouseTargetY = 0;
 
-startButton.addEventListener(
-    "click",
-    startDeviceOrientation
+
+window.addEventListener(
+    "mousemove",
+    (event) => {
+
+        if (orientationAvailable) {
+            return;
+        }
+
+
+        mouseTargetX =
+            (
+                event.clientX /
+                window.innerWidth
+                - 0.5
+            ) * 2;
+
+        mouseTargetY =
+            (
+                event.clientY /
+                window.innerHeight
+                - 0.5
+            ) * 2;
+    }
 );
 
 
-// ============================================================
-// CAMERA ROTATION
-// ============================================================
+function updateMouseCamera() {
 
-function updateCamera() {
-
-    /*
-        DeviceOrientation gives us degrees.
-
-        Three.js uses radians.
-    */
-
-    const alpha =
-        THREE.MathUtils.degToRad(
-            smoothAlpha
-        );
-
-    const beta =
-        THREE.MathUtils.degToRad(
-            smoothBeta
-        );
-
-    const gamma =
-        THREE.MathUtils.degToRad(
-            smoothGamma
-        );
+    if (orientationAvailable) {
+        return;
+    }
 
 
-    /*
-        The order matters.
+    mouseX +=
+        (mouseTargetX - mouseX) * 0.08;
 
-        This creates a simple approximation of
-        the phone's orientation.
-    */
-
-    const euler =
-        new THREE.Euler(
-            beta,
-            alpha,
-            -gamma,
-            "YXZ"
-        );
+    mouseY +=
+        (mouseTargetY - mouseY) * 0.08;
 
 
-    camera.quaternion.setFromEuler(
-        euler
-    );
+    camera.rotation.y =
+        -mouseX * 1.5;
+
+    camera.rotation.x =
+        -mouseY * 0.8;
 }
-
-
-// ============================================================
-// ANIMATION
-// ============================================================
 
 function animate() {
 
     requestAnimationFrame(animate);
 
+    if (orientationAvailable) {
 
-    /*
-        Smooth the sensor movement.
+        updateDeviceCamera();
 
-        Without this, the camera can feel
-        extremely shaky because phone sensors
-        are noisy.
-    */
+    } else {
 
-    smoothAlpha +=
-        (deviceAlpha - smoothAlpha) * 0.12;
+        updateMouseCamera();
 
-    smoothBeta +=
-        (deviceBeta - smoothBeta) * 0.12;
-
-    smoothGamma +=
-        (deviceGamma - smoothGamma) * 0.12;
-
-
-    updateCamera();
+    }
 
 
     renderer.render(
@@ -404,7 +386,6 @@ function animate() {
 
 
 animate();
-
 
 window.addEventListener(
     "resize",
