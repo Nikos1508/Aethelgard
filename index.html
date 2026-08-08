@@ -8,9 +8,32 @@
         <link rel="stylesheet" href="./style.css" />
     </head>
     
-    <body>
-        <canvas id="starfield"></canvas>
+<body>
 
-        <script src="script.js"></script>
-    </body>
+    <canvas id="starfield"></canvas>
+
+    <div id="ui">
+        <h1>TIME CAPSULE</h1>
+
+        <p id="status">
+            Move your phone to explore the sky
+        </p>
+
+        <button id="startButton">
+            ENTER THE SKY
+        </button>
+
+        <div id="debug">
+            Alpha: <span id="alpha">0</span><br>
+            Beta: <span id="beta">0</span><br>
+            Gamma: <span id="gamma">0</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
 </html>

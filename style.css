@@ -5,58 +5,158 @@
     --white: #f1edee;
     --dark-blue: #0F1931;
     --dark-blue-2: #213050;
-    --lilac: 
+}
 
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: var(--black);
+
+    font-family: 'Poppins', sans-serif;
+    color: var(--white);
 }
 
 body {
-    background-color: var(--black);
-    font-family: 'Poppins', sans-serif;
-    color: var(--white);
-    overflow: hidden;
-    min-height: 100vh;
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
-    pointer-events: none;
-    z-index: 0;
-    background-image: 
-        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
-        radial-gradient(2px 2px at 40px 70px, #ffb8b8, rgba(0, 0, 0, 0)),
-        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
-        radial-gradient(2px 2px at 160px 120px, #ffd166, rgba(0, 0, 0, 0)),
-        radial-gradient(2px 2px at 230px 80px, #ffffff, rgba(0, 0, 0, 0)),
-        radial-gradient(1px 1px at 320px 200px, #70a1ff, rgba(0, 0, 0, 0)),
-        radial-gradient(2px 2px at 400px 150px, #ffffff, rgba(0, 0, 0, 0)),
-        radial-gradient(1px 1px at 500px 250px, #ffffff, rgba(0, 0, 0, 0)),
-        radial-gradient(2px 2px at 450px 310px, #ff9ff3, rgba(0, 0, 0, 0));
-    background-repeat: repeat;
-    background-size: 500px 500px;
-    opacity: 0.9;
-    mix-blend-mode: screen;
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 8px var(--accent-light));
-    animation: twinkle 4s ease-in-out infinite alternate;
+    position: relative;
 }
+
+/* 3D canvas */
 
 #starfield {
     position: fixed;
+
     top: 0;
     left: 0;
+
     width: 100vw;
     height: 100vh;
-    z-index: -1;
+
+    display: block;
+
+    z-index: 0;
+}
+
+
+/* UI */
+
+#ui {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    z-index: 10;
+
     pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(15, 25, 49, 0.05),
+            rgba(2, 2, 10, 0.45)
+        );
 }
 
-button {
-    font-family: 'Poppins', sans-serif;
+#ui h1 {
+    margin: 0;
+
+    font-size: clamp(2rem, 8vw, 5rem);
+
+    font-weight: 800;
+
+    letter-spacing: 0.15em;
+
+    text-shadow:
+        0 0 20px rgba(255,255,255,0.25),
+        0 0 50px rgba(112,161,255,0.2);
 }
 
-@keyframes twinkle{
-    0% {opacity: 0.2};
-    100%{opacity: 1};
+#status {
+    margin-top: 10px;
+
+    font-size: 0.95rem;
+
+    font-weight: 300;
+
+    opacity: 0.75;
+}
+
+#startButton {
+    margin-top: 30px;
+
+    padding: 14px 28px;
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 0.9rem;
+
+    letter-spacing: 0.08em;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    transition:
+        transform 0.2s ease;
+}
+
+#startButton:hover {
+    transform: scale(1.05);
+
+    background: rgba(255,255,255,0.15);
+}
+
+#debug {
+    position: fixed;
+
+    bottom: 20px;
+    left: 20px;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(8px);
+
+    font-size: 11px;
+
+    line-height: 1.7;
+
+    opacity: 0.4;
+
+    text-align: left;
 }
